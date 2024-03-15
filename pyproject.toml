@@ -1,16 +1,15 @@
 [tool.poetry]
-name = "chatgpt-wrapper"
+name = "chatrapper"
 version = "0.1.0"
 description = ""
 authors = ["ultrasev <i@ultrasev.com>"]
 readme = "README.md"
-packages = [{include = "chatgpt_wrapper"}]
+packages = [{include = "chatrapper"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 uuid = "^1.30"
 httpx = "^0.27.0"
-pydantic = "^2.6.4"
 websockets = "^12.0"
 
 [build-system]

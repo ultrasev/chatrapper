@@ -7,14 +7,30 @@ from uuid import uuid4
 
 import httpx
 import websockets
+import logging
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
 
-class GPTWrapper(object):
+class MessageDeserializer(object):
+    def __init__(self, data: str) -> None:
+        self.data = data.lstrip("data: ").strip()
+
+    def __str__(self) -> str:
+        try:
+            js = json.loads(self.data)
+            return js['message']['content']['parts'][0]
+        except json.decoder.JSONDecodeError:
+            return ""
+        except KeyError:
+            logging.error(f"Error: {self.data}")
+            return ""
+
+
+class AsyncRapper(object):
     def __init__(self,
                  access_token: str,
-                 model: str) -> None:
-        """ API wrapper for OpenAI's ChatGPT.
+                 model: str = "text-davinci-002-render-sha") -> None:
+        """ API (w)rapper for OpenAI's ChatGPT.
         Args:
             access_token (str): ChatGPT access token, acquired from https://chat.openai.com/api/auth/session
             model (str): model name, options include:
@@ -23,13 +39,6 @@ class GPTWrapper(object):
         """
         self.access_token = access_token
         self.model = model
-
-    def get_content(self, chunk: str) -> str:
-        try:
-            text = chunk.lstrip("data: ").strip()
-            return json.loads(text)['message']['content']['parts'][0]
-        except json.decoder.JSONDecodeError:
-            return ""
 
     async def _stream_from_wss(self, chunk: str) -> typing.AsyncGenerator[str, None]:
         url = json.loads(chunk)['wss_url']
@@ -93,9 +102,9 @@ class GPTWrapper(object):
                     chunk = chunk.lstrip("data: ").strip()
                     if "wss_url" in chunk:
                         async for x in self._stream_from_wss(chunk):
-                            yield self.get_content(x)
+                            yield str(MessageDeserializer(x))
                     else:
-                        yield self.get_content(chunk)
+                        yield str(MessageDeserializer(chunk))
 
     async def __call__(self, text: str) -> str:
         prev = ""
@@ -105,15 +114,11 @@ class GPTWrapper(object):
         return prev
 
 
-async def async_chat(text: str,
-                     token: str,
-                     model: str = "text-davinci-002-render-sha") -> str:
-    rapper = GPTWrapper(token, model)
-    response = await rapper(text)
-    return response
+class Rapper(object):
+    def __init__(self,
+                 access_token: str,
+                 model: str = "text-davinci-002-render-sha") -> None:
+        self.(_)proxy = AsyncRapper(access_token, model)
 
-
-def chat(text: str,
-         token: str,
-         model: str = "text-davinci-002-render-sha") -> str:
-    return asyncio.run(async_chat(text, token, model))
+    def __call__(self, text: str) -> str:
+        return asyncio.run(self._proxy(text)())
