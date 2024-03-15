@@ -1,5 +1,5 @@
 <figure style="text-align: left;">
-    <img src="data/logo.png" width=129pt>
+    <img src="https://s3.bmp.ovh/imgs/2024/03/15/2aa0a21860f0ded7.png" width=189pt>
 </figure>
 
 # ChatGPT API (W)rapper
@@ -45,6 +45,6 @@ async def main():
 asyncio.run(main())
 ```
 
-# 注意事项
+# Notes
 - 一定要保护好自己的 token，不要泄露给他人。
 - 合理使用 API，调用频率不宜过高，避免触发风控。
