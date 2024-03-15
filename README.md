@@ -1,8 +1,13 @@
-<figure style="text-align: left;">
-    <img src="https://s3.bmp.ovh/imgs/2024/03/15/2aa0a21860f0ded7.png" width=189pt>
-</figure>
 
-# ChatGPT API (W)rapper
+<div align="center">
+ <figure style="text-align: align;">
+     <img src="https://s3.bmp.ovh/imgs/2024/03/15/2aa0a21860f0ded7.png" width=189pt>
+ </figure>
+<h2>ChatGPT API (W)rapper</h2>
+
+<a href='https://follow-your-click.github.io/'><img src='https://img.shields.io/badge/Project-Page-Green'></a> ![visitors](https://visitor-badge.laobi.icu/badge?page_id=ultrasev.chatrapper&left_color=green&right_color=red)  [![GitHub](https://img.shields.io/github/stars/ultrasev/chatrapper?style=social)](https://github.com/ultrasev/chatrapper)
+</div>
+
 把网页版 ChatGPT 包装为一个简单的 API，以便在代码、脚本中使用。
 
 # Installation
