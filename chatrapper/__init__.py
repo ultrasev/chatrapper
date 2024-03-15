@@ -118,7 +118,7 @@ class Rapper(object):
     def __init__(self,
                  access_token: str,
                  model: str = "text-davinci-002-render-sha") -> None:
-        self.(_)proxy = AsyncRapper(access_token, model)
+        self._proxy = AsyncRapper(access_token, model)
 
     def __call__(self, text: str) -> str:
         return asyncio.run(self._proxy(text)())

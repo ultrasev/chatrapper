@@ -2,9 +2,8 @@
     <img src="data/logo.png" width=129pt>
 </figure>
 
-# ChatGPT API wrapper
-
-将 ChatGPT 包装为一个简单的 API，以便在代码、脚本中使用。
+# ChatGPT API (W)rapper
+把网页版 ChatGPT 包装为一个简单的 API，以便在代码、脚本中使用。
 
 # Installation
 ```bash
@@ -17,26 +16,26 @@ pip3 install git+https://github.com/ultrasev/chatrapper.git
 export TOKEN="eyJhbGci..."
 ```
 
-在 Python 中使用 `Rapper`:
+在代码中使用 `Rapper`:
 ```python
 import os
-from chatgpt_wrapper import GPTWrapper
+from chatrapper import Rapper
 token = os.environ.get("TOKEN")
-rapper = GPTWrapper(
+rapper = Rapper(
     access_token=token
     model="text-davinci-002-render-sha"
 )
 rapper("鲁迅为什么打周树人？")
 ```
 
-或者有异步需求的话，可以使用 `AsyncGPTWrapper`:
+或者有异步需求的话，可以使用 `AsyncRapper`:
 ```python
 import os
 import asyncio
-from chatgpt_wrapper import AsyncGPTWrapper
+from chatrapper import AsyncRapper
 
 token = os.environ.get("TOKEN")
-rapper = AsyncGPTWrapper(
+rapper = AsyncRapper(
     access_token=token
     model="text-davinci-002-render-sha"
 )
