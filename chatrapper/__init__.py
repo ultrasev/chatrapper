@@ -121,4 +121,4 @@ class Rapper(object):
         self._proxy = AsyncRapper(access_token, model)
 
     def __call__(self, text: str) -> str:
-        return asyncio.run(self._proxy(text)())
+        return asyncio.run(self._proxy(text))
