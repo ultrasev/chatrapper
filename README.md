@@ -45,6 +45,13 @@ async def main():
 asyncio.run(main())
 ```
 
+Demo:
+
+<figure style="text-align: left;">
+    <img src="https://s3.bmp.ovh/imgs/2024/03/15/25ea45935e95e00e.gif" width=589pt>
+</figure>
+
+
 # Notes
 - 一定要保护好自己的 token，不要泄露给他人。
 - 合理使用 API，调用频率不宜过高，避免触发风控。
