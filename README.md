@@ -33,7 +33,8 @@ rapper = Rapper(
 rapper("鲁迅为什么打周树人？")
 ```
 
-或者有异步需求的话，可以使用 `AsyncRapper`:
+或者有异步需求的话，可以使用 `AsyncRapper`。这种情况下，最好有多个账号支持，单账号下，同一时间只支持一轮对话。
+
 ```python
 import os
 import asyncio
@@ -59,4 +60,4 @@ Demo:
 
 # Notes
 - 一定要保护好自己的 token，不要泄露给他人。
-- 合理使用 API，调用频率不宜过高，避免触发风控。
+- 合理使用 API，调用频率不宜过高，树大易招风，避免触发风控。
