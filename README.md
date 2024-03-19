@@ -8,7 +8,7 @@
 <a href='https://follow-your-click.github.io/'><img src='https://img.shields.io/badge/Project-Page-Green'></a> ![visitors](https://visitor-badge.laobi.icu/badge?page_id=ultrasev.chatrapper&left_color=green&right_color=red)  [![GitHub](https://img.shields.io/github/stars/ultrasev/chatrapper?style=social)](https://github.com/ultrasev/chatrapper)
 </div>
 
-把网页版 ChatGPT 包装为一个简单的 API，以便在代码、脚本中使用。
+把网页版 ChatGPT 封装为一个简单的 API，以便在代码中使用。
 
 # Installation
 ```bash
