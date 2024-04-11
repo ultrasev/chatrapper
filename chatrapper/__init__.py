@@ -13,24 +13,32 @@ from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
 BASE_URL = "https://chat.openai.com"
 
-HEADERS = {"accept": "*/*",
-           "accept-language": "en-US,en;q=0.9",
-           "cache-control": "no-cache",
-           "content-type": "application/json",
-           "oai-language": "en-US",
-           "origin": BASE_URL,
-           "pragma": "no-cache",
-           "referer": BASE_URL,
-           "sec-ch-ua":
-           '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-           "sec-ch-ua-mobile": "?0",
-           "sec-ch-ua-platform": '"Windows"',
-           "sec-fetch-dest": "empty",
-           "sec-fetch-mode": "cors",
-           "sec-fetch-site": "same-origin",
-           "user-agent":
-           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-           }
+
+class ReqHeader(object):
+    def __init__(self, **kwargs):
+        self._dict = {
+            "accept": "*/*",
+            "accept-language": "en-US,en;q=0.9",
+            "cache-control": "no-cache",
+            "content-type": "application/json",
+            "oai-language": "en-US",
+            "origin": BASE_URL,
+            "pragma": "no-cache",
+            "referer": BASE_URL,
+            "sec-ch-ua":
+            '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "user-agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+        }
+        self._dict.update(kwargs)
+
+    def __iter__(self):
+        return iter(self._dict.items())
 
 
 class MessageDeserializer(object):
@@ -50,7 +58,7 @@ class MessageDeserializer(object):
 
 class AsyncRapper(object):
     def __init__(self,
-                 access_token: str,
+                 access_token: str = "",
                  model: str = "text-davinci-002-render-sha") -> None:
         """ API (w)rapper for OpenAI's ChatGPT.
         Args:
@@ -64,8 +72,7 @@ class AsyncRapper(object):
         self.device_id = str(uuid.uuid4())
 
     async def get_new_session_id(self) -> str:
-        headers = HEADERS.copy()
-        headers["oai-device-id"] = self.device_id
+        headers = dict(ReqHeader(**{"oai-device-id": self.device_id}))
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"{BASE_URL}/backend-anon/sentinel/chat-requirements", headers=headers
@@ -121,16 +128,17 @@ class AsyncRapper(object):
 
         session_id = await self.get_new_session_id()
         assert session_id is not None, "Failed to get session ID"
-        headers = HEADERS.copy()
-        headers['oai-device-id'] = self.device_id
-        headers['openai-sentinel-chat-requirements-token'] = session_id
+        headers = dict(ReqHeader(
+            **{"oai-device-id": self.device_id,
+               "openai-sentinel-chat-requirements-token": session_id}))
 
         async with httpx.AsyncClient() as client:
             async with client.stream(
-                'POST',
-                url="https://chat.openai.com/backend-api/conversation",
-                headers=headers,
-                    data=json.dumps(body)) as response:
+                    'POST',
+                    url=f"{BASE_URL}/backend-api/conversation",
+                    headers=headers,
+                    data=json.dumps(body)
+            ) as response:
                 async for chunk in response.aiter_text():
                     chunk = chunk.lstrip("data: ").strip()
                     if "wss_url" in chunk:
@@ -149,7 +157,7 @@ class AsyncRapper(object):
 
 class Rapper(object):
     def __init__(self,
-                 access_token: str,
+                 access_token: str = "",
                  model: str = "text-davinci-002-render-sha") -> None:
         self._proxy = AsyncRapper(access_token, model)
 
