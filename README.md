@@ -8,28 +8,19 @@
 <a href='https://follow-your-click.github.io/'><img src='https://img.shields.io/badge/Project-Page-Green'></a> ![visitors](https://visitor-badge.laobi.icu/badge?page_id=ultrasev.chatrapper&left_color=green&right_color=red)  [![GitHub](https://img.shields.io/github/stars/ultrasev/chatrapper?style=social)](https://github.com/ultrasev/chatrapper)
 </div>
 
-把网页版 ChatGPT 封装为一个简单的 API，以便在代码中使用。
+把网页版 ChatGPT 封装为一个 API，以便在代码中使用。
 
-# Installation
+# 本地安装
 ```bash
 pip3 install git+https://github.com/ultrasev/chatrapper.git
 ```
 
-# Usage
-环境变量中设置 `TOKEN`，然后调用 `chat` 函数即可。
-```bash
-export TOKEN="eyJhbGci..."
-```
-
+# 代码中直接使用
 在代码中使用 `Rapper`:
 ```python
 import os
 from chatrapper import Rapper
-token = os.environ.get("TOKEN")
-rapper = Rapper(
-    access_token=token
-    model="text-davinci-002-render-sha"
-)
+rapper = Rapper()
 rapper("鲁迅为什么打周树人？")
 ```
 
@@ -39,12 +30,7 @@ rapper("鲁迅为什么打周树人？")
 import os
 import asyncio
 from chatrapper import AsyncRapper
-
-token = os.environ.get("TOKEN")
-rapper = AsyncRapper(
-    access_token=token
-    model="text-davinci-002-render-sha"
-)
+rapper = AsyncRapper()
 async def main():
     print(await rapper("鲁迅为什么打周树人？"))
 
@@ -57,7 +43,30 @@ Demo:
     <img src="https://s3.bmp.ovh/imgs/2024/03/15/25ea45935e95e00e.gif" width=589pt>
 </figure>
 
+# Docker 部署
+```bash
+docker run --name chatrapper -p 9000:9000 ghcr.io/ultrasev/chatrapper
+```
+
+请求示例:
+```bash
+curl http://127.0.0.1:9000/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer any_string_you_like" \
+    -d '{
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "鲁迅为什么打周树人"
+                }
+            ],
+            "stream": true
+    }'
+```
 
 # Notes
-- 一定要保护好自己的 token，不要泄露给他人。
 - 合理使用 API，调用频率不宜过高，树大易招风，避免触发风控。
+
+# TODO
+- [ ] 结合 access_token 支持 GPT-4（需要登录且开通 premium）。

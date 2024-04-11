@@ -14,7 +14,6 @@ websockets = "^12.0"
 pydantic = "1.10.11"
 fastapi = "0.98.0"
 starlette = "0.27.0"
-expiringdict = "1.2.2"
 uvicorn = "0.22.0"
 
 [build-system]
