@@ -5,14 +5,12 @@ import base64
 import json
 import typing
 from uuid import uuid4
-import expiringdict
 import httpx
 import websockets
 import logging
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
 BASE_URL = "https://chat.openai.com"
-EXPDICT = expiringdict.ExpiringDict(max_len=100, max_age_seconds=120)
 
 
 class RefreshTokenException(Exception):
@@ -80,24 +78,18 @@ class AsyncRapper(object):
         self.device_id = str(uuid.uuid4())
 
     async def get_new_session_id(self) -> str:
-        try:
-            return EXPDICT[self.device_id]
-        except KeyError:
-            self.device_id = str(uuid.uuid4())
-            headers = dict(ReqHeader(**{"oai-device-id": self.device_id}))
-
-            async with httpx.AsyncClient(timeout=30) as client:
-                response = await client.post(
-                    f"{BASE_URL}/backend-anon/sentinel/chat-requirements",
-                    headers=headers)
-                if response.status_code == 200:
-                    data = response.json()
-                    token = data.get('token')
-                    EXPDICT[self.device_id] = token
-                    return token
-                else:
-                    logging.error(response.text)
-                    logging.error("Failed to refresh session ID and token")
+        headers = dict(ReqHeader(**{"oai-device-id": self.device_id}))
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(
+                f"{BASE_URL}/backend-anon/sentinel/chat-requirements",
+                headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                token = data.get('token')
+                return token
+            else:
+                logging.error(response.text)
+                logging.error("Failed to refresh session ID and token")
 
     def get_body(self, inputx: typing.Union[str, typing.List[typing.Dict]]) -> typing.Dict:
         body = {
