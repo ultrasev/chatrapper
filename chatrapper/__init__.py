@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import asyncio
+import uuid
 import base64
 import json
 import typing
@@ -9,6 +10,27 @@ import httpx
 import websockets
 import logging
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+
+BASE_URL = "https://chat.openai.com"
+
+HEADERS = {"accept": "*/*",
+           "accept-language": "en-US,en;q=0.9",
+           "cache-control": "no-cache",
+           "content-type": "application/json",
+           "oai-language": "en-US",
+           "origin": BASE_URL,
+           "pragma": "no-cache",
+           "referer": BASE_URL,
+           "sec-ch-ua":
+           '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+           "sec-ch-ua-mobile": "?0",
+           "sec-ch-ua-platform": '"Windows"',
+           "sec-fetch-dest": "empty",
+           "sec-fetch-mode": "cors",
+           "sec-fetch-site": "same-origin",
+           "user-agent":
+           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+           }
 
 
 class MessageDeserializer(object):
@@ -39,6 +61,22 @@ class AsyncRapper(object):
         """
         self.access_token = access_token
         self.model = model
+        self.device_id = str(uuid.uuid4())
+
+    async def get_new_session_id(self) -> str:
+        headers = HEADERS.copy()
+        headers["oai-device-id"] = self.device_id
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{BASE_URL}/backend-anon/sentinel/chat-requirements", headers=headers
+            )
+            if response.status_code == 200:
+                data = response.json()
+                token = data.get('token')
+                return token
+            else:
+                logging.error(response.text)
+                logging.error("Failed to refresh session ID and token")
 
     async def _stream_from_wss(self, chunk: str) -> typing.AsyncGenerator[str, None]:
         url = json.loads(chunk)['wss_url']
@@ -81,22 +119,17 @@ class AsyncRapper(object):
             "stream": True
         }
 
+        session_id = await self.get_new_session_id()
+        assert session_id is not None, "Failed to get session ID"
+        headers = HEADERS.copy()
+        headers['oai-device-id'] = self.device_id
+        headers['openai-sentinel-chat-requirements-token'] = session_id
+
         async with httpx.AsyncClient() as client:
             async with client.stream(
                 'POST',
                 url="https://chat.openai.com/backend-api/conversation",
-                headers={
-                    "accept": "text/event-stream",
-                    "accept-language": "en-US",
-                    "authorization": f"Bearer {self.access_token}",
-                    "content-type": "application/json",
-                    "sec-fetch-dest": "empty",
-                    "sec-fetch-mode": "cors",
-                    "sec-fetch-site": "same-origin",
-                    "Referer": "https://chat.openai.com/",
-                    "Referrer-Policy": "strict-origin-when-cross-origin",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
-                },
+                headers=headers,
                     data=json.dumps(body)) as response:
                 async for chunk in response.aiter_text():
                     chunk = chunk.lstrip("data: ").strip()
