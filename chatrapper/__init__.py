@@ -59,16 +59,19 @@ class MessageDeserializer(object):
 class AsyncRapper(object):
     def __init__(self,
                  access_token: str = "",
-                 model: str = "text-davinci-002-render-sha") -> None:
+                 model: str = "text-davinci-002-render-sha",
+                 stream: bool = True) -> None:
         """ API (w)rapper for OpenAI's ChatGPT.
         Args:
             access_token (str): ChatGPT access token, acquired from https://chat.openai.com/api/auth/session
             model (str): model name, options include:
                 - "text-davinci-002-render-sha", default model for ChatGPT-3.5
                 - "GPT-4", GPT-4 model
+            stream (bool): whether to print the output in real-time or not
         """
         self.access_token = access_token
         self.model = model
+        self.stream_real_time = stream
         self.device_id = str(uuid.uuid4())
 
     async def get_new_session_id(self) -> str:
@@ -150,7 +153,8 @@ class AsyncRapper(object):
     async def __call__(self, text: str) -> str:
         prev = ""
         async for x in self.stream(text):
-            print(x.replace(prev, ""), end="", flush=True)
+            if self.stream_real_time:
+                print(x.replace(prev, ""), end="", flush=True)
             prev = max(prev, x, key=len)
         return prev
 
@@ -158,8 +162,10 @@ class AsyncRapper(object):
 class Rapper(object):
     def __init__(self,
                  access_token: str = "",
-                 model: str = "text-davinci-002-render-sha") -> None:
-        self._proxy = AsyncRapper(access_token, model)
+                 model: str = "text-davinci-002-render-sha",
+                 stream: bool = True
+                 ) -> None:
+        self._proxy = AsyncRapper(access_token, model, stream)
 
     def __call__(self, text: str) -> str:
         return asyncio.run(self._proxy(text))
