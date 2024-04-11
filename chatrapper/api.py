@@ -33,7 +33,8 @@ async def get_chat_completions(completion: ChatCompletion):
                                 completion.messages))
         else:
             return await AsyncRapper(model=completion.model,
-                                     stream=completion.stream)(completion.messages)
+                                     stream=completion.stream)(
+                                         completion.messages)
     except RefreshTokenException as e:
         logging.error(e)
         return {"error": "Failed to refresh token"}

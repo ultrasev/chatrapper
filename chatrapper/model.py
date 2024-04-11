@@ -99,22 +99,6 @@ class AsyncRapper(object):
                     logging.error(response.text)
                     logging.error("Failed to refresh session ID and token")
 
-    async def _stream_from_wss(self, chunk: str) -> typing.AsyncGenerator[str, None]:
-        url = json.loads(chunk)['wss_url']
-        async with websockets.connect(url) as websocket:
-            while True:
-                try:
-                    response = await websocket.recv()
-                    body = json.loads(response)["body"]
-                    body = base64.b64decode(body).decode('utf-8')
-                    if 'DONE' in body:
-                        break
-                    yield body
-                except ConnectionClosedOK:
-                    break
-                except ConnectionClosedError:
-                    break
-
     def get_body(self, inputx: typing.Union[str, typing.List[typing.Dict]]) -> typing.Dict:
         body = {
             "action": "next",
@@ -151,6 +135,22 @@ class AsyncRapper(object):
             return body
         else:
             raise ValueError("Invalid input type")
+
+    async def _stream_from_wss(self, chunk: str) -> typing.AsyncGenerator[str, None]:
+        url = json.loads(chunk)['wss_url']
+        async with websockets.connect(url) as websocket:
+            while True:
+                try:
+                    response = await websocket.recv()
+                    body = json.loads(response)["body"]
+                    body = base64.b64decode(body).decode('utf-8')
+                    if 'DONE' in body:
+                        break
+                    yield body
+                except ConnectionClosedOK:
+                    break
+                except ConnectionClosedError:
+                    break
 
     async def stream(self, inputx: typing.Union[str, typing.List[typing.Dict]]) -> typing.AsyncGenerator[str, None]:
         session_id = await self.get_new_session_id()
