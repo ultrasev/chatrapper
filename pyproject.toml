@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "chatrapper"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["ultrasev <i@ultrasev.com>"]
 readme = "README.md"

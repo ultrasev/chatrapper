@@ -159,7 +159,7 @@ class AsyncRapper(object):
                     'POST',
                     url=f"{BASE_URL}/backend-api/conversation",
                     headers=headers,
-                    data=json.dumps(body)
+                    content=json.dumps(body)
             ) as response:
                 async for chunk in response.aiter_text():
                     chunk = chunk.lstrip("data: ").strip()

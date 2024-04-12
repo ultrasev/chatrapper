@@ -7,8 +7,7 @@ RUN pip install poetry
 COPY pyproject.toml /app/
 COPY chatrapper/ /app/chatrapper/
 
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
+RUN poetry install --only main
 
 EXPOSE 9000
 
