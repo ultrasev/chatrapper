@@ -5,10 +5,11 @@
  </figure>
 <h2>ChatGPT API (W)rapper</h2>
 
-<a href='https://follow-your-click.github.io/'><img src='https://img.shields.io/badge/Project-Page-Green'></a> ![visitors](https://visitor-badge.laobi.icu/badge?page_id=ultrasev.chatrapper&left_color=green&right_color=red)  [![GitHub](https://img.shields.io/github/stars/ultrasev/chatrapper?style=social)](https://github.com/ultrasev/chatrapper)
 </div>
 
 把网页版 ChatGPT 封装为一个简单的 API，以便在代码中使用。
+
+> OpenAI 对逆向的限制越来越严格，逆向难度越来越大，且各平台的 API 已经很便宜了，像 Groq 的 Llama 3 API 还一直是免费的，不太建议大家继续研究这类项目了。如果特别需要，可以参考作者的另一个项目 [juchats](https://github.com/ultrasev/juchats)，有更多免费模型可以使用。
 
 # Installation
 ```bash
